@@ -1,0 +1,22 @@
+version: 2
+
+models:
+  - name: fct_campaign_daily
+    description: Daily campaign x market x platform x break_type performance
+    columns:
+      - name: event_date
+        tests: [not_null]
+      - name: campaign_id
+        tests: [not_null]
+      - name: fill_rate
+        description: impressions / requests; null if no requests
+      - name: ecpm
+        description: effective CPM from clearing_price_micros
+
+  - name: fct_pod_fill
+    description: Pod-level fill — midrolls often request 2–3 and fill 1
+    columns:
+      - name: pod_id
+        tests: [not_null]
+      - name: filled
+        tests: [not_null]

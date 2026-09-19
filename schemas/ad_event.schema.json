@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "adstream/ad_event.json",
+  "title": "AdStreamSSABeacon",
+  "type": "object",
+  "required": [
+    "event_id",
+    "event_type",
+    "event_ts",
+    "session_id",
+    "content_id",
+    "pod_id",
+    "break_type",
+    "platform",
+    "market",
+    "campaign_id"
+  ],
+  "properties": {
+    "event_id": { "type": "string", "minLength": 8 },
+    "event_type": {
+      "type": "string",
+      "enum": ["ad_request", "ad_impression", "ad_click", "ad_quartile", "ad_error"]
+    },
+    "event_ts": { "type": "string", "format": "date-time" },
+    "ingest_ts": { "type": "string", "format": "date-time" },
+    "session_id": { "type": "string" },
+    "content_id": { "type": "string" },
+    "pod_id": { "type": "string" },
+    "slot_index": { "type": "integer", "minimum": 0 },
+    "break_type": { "type": "string", "enum": ["preroll", "midroll", "postroll"] },
+    "platform": { "type": "string", "enum": ["android", "ios", "web", "tv"] },
+    "market": { "type": "string", "minLength": 2, "maxLength": 2 },
+    "campaign_id": { "type": "string" },
+    "creative_id": { "type": ["string", "null"] },
+    "advertiser_id": { "type": ["string", "null"] },
+    "quartile": { "type": ["integer", "null"], "enum": [25, 50, 75, 100, null] },
+    "error_code": { "type": ["string", "null"] },
+    "bid_floor_micros": { "type": ["integer", "null"], "minimum": 0 },
+    "clearing_price_micros": { "type": ["integer", "null"], "minimum": 0 },
+    "is_late": { "type": "boolean", "default": false }
+  },
+  "additionalProperties": false
+}

@@ -1,0 +1,9 @@
+version: 2
+
+sources:
+  - name: lake
+    description: Silver parquet landed by the Spark/pandas job
+    schema: main
+    tables:
+      - name: ad_events_silver
+        description: Deduped SSAI beacons

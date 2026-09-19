@@ -1,0 +1,7 @@
+adstream:
+  target: dev
+  outputs:
+    dev:
+      type: duckdb
+      path: ../../data/duckdb/adstream.duckdb
+      threads: 4

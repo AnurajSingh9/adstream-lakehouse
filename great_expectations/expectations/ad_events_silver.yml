@@ -1,0 +1,7 @@
+# Lightweight expectation docs — the executable gate is great_expectations_gate.py
+# (full GE checkpoint YAML tends to rot when nobody's running GE Cloud).
+
+suite: ad_events_silver
+notes: >
+  Impressions should not wildly exceed requests. Fill rate mean for a normal
+  OTT day sits roughly 0.55–0.95 depending on midroll mix.
