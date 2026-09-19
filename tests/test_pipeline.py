@@ -29,7 +29,7 @@ def sample_ds():
         cwd=ROOT,
         env=env,
     )
-    return sorted(p.name.replace("dt=", "") for p in (ROOT / "data/bronze/ad_events").glob("dt=*"))[-1]
+    return max(p.name.replace("dt=", "") for p in (ROOT / "data/bronze/ad_events").glob("dt=*"))
 
 
 def test_schema_rejects_unknown_event():
