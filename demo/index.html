@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AdStream — live demo</title>
+  <style>
+    :root {
+      --bg: #0b1014;
+      --panel: #12181e;
+      --line: #24303a;
+      --text: #e8eef2;
+      --muted: #8b9aa6;
+      --accent: #35e6a2;
+      --warn: #e6b35a;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "IBM Plex Sans", "Segoe UI", sans-serif;
+      background: radial-gradient(1200px 600px at 10% -10%, #143028 0%, var(--bg) 45%);
+      color: var(--text);
+      line-height: 1.45;
+    }
+    .wrap { max-width: 980px; margin: 0 auto; padding: 28px 18px 48px; }
+    .mono { font-family: "IBM Plex Mono", "SF Mono", Menlo, monospace; }
+    h1 { font-size: 1.6rem; margin: 0 0 6px; letter-spacing: -0.02em; }
+    .sub { color: var(--muted); margin: 0 0 22px; font-size: 0.95rem; }
+    a { color: var(--accent); }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 10px;
+      margin-bottom: 22px;
+    }
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 14px 14px 12px;
+    }
+    .card .k { color: var(--muted); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.04em; }
+    .card .v { font-size: 1.35rem; font-weight: 650; margin-top: 4px; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.86rem;
+    }
+    th, td {
+      text-align: left;
+      padding: 8px 8px;
+      border-bottom: 1px solid var(--line);
+      white-space: nowrap;
+    }
+    th { color: var(--muted); font-weight: 550; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.03em; }
+    .panel { margin-bottom: 22px; }
+    .panel h2 { font-size: 1rem; margin: 0 0 10px; }
+    .note {
+      color: var(--muted);
+      font-size: 0.82rem;
+      margin-top: 18px;
+      border-top: 1px solid var(--line);
+      padding-top: 14px;
+    }
+    .pill {
+      display: inline-block;
+      border: 1px solid var(--line);
+      padding: 2px 8px;
+      border-radius: 999px;
+      color: var(--accent);
+      font-size: 0.75rem;
+      margin-bottom: 10px;
+    }
+    .scroll { overflow-x: auto; border: 1px solid var(--line); border-radius: 10px; background: var(--panel); }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="pill mono">live demo · sample gold marts</div>
+    <h1>AdStream</h1>
+    <p class="sub">
+      OTT AdTech lakehouse read-out — campaign fill / eCPM and pod fill from the gold layer.
+      Full pipeline code on
+      <a href="https://github.com/AnurajSingh9/adstream-lakehouse">GitHub</a>.
+    </p>
+
+    <div class="grid" id="summary"></div>
+
+    <section class="panel">
+      <h2>Campaign daily <span class="mono" style="color:var(--muted);font-weight:400;font-size:0.85rem">fct_campaign_daily</span></h2>
+      <div class="scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>Date</th><th>Campaign</th><th>Market</th><th>Platform</th><th>Break</th>
+              <th>Req</th><th>Imp</th><th>Fill</th><th>eCPM</th><th>Revenue</th>
+            </tr>
+          </thead>
+          <tbody id="campaigns"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>Pod fill <span class="mono" style="color:var(--muted);font-weight:400;font-size:0.85rem">fct_pod_fill</span></h2>
+      <div class="scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>Date</th><th>Pod</th><th>Break</th><th>Platform</th><th>Market</th>
+              <th>Req</th><th>Imp</th><th>Filled</th><th>Pod fill</th>
+            </tr>
+          </thead>
+          <tbody id="pods"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <p class="note">
+      Numbers are from a synthetic SSAI beacon run in this repo (not production Hotstar data).
+      Re-run locally with <span class="mono">make sample && make silver && make gold && make api</span>.
+    </p>
+  </div>
+  <script>
+    const pct = (x) => x == null || x === "" ? "—" : (Number(x) * 100).toFixed(1) + "%";
+    const num = (x, d=2) => x == null || x === "" ? "—" : Number(x).toFixed(d);
+    fetch("./data.json")
+      .then((r) => r.json())
+      .then((data) => {
+        const s = data.summary;
+        const cards = [
+          ["Day", s.ds],
+          ["Requests", s.requests],
+          ["Impressions", s.impressions],
+          ["Fill rate", pct(s.fill_rate)],
+          ["Clicks", s.clicks],
+          ["Revenue", num(s.revenue, 3)],
+        ];
+        document.getElementById("summary").innerHTML = cards
+          .map(([k, v]) => `<div class="card"><div class="k">${k}</div><div class="v mono">${v}</div></div>`)
+          .join("");
+
+        document.getElementById("campaigns").innerHTML = data.campaigns
+          .slice(0, 25)
+          .map((r) => `<tr>
+            <td class="mono">${r.event_date}</td>
+            <td class="mono">${r.campaign_id}</td>
+            <td>${r.market}</td>
+            <td>${r.platform}</td>
+            <td>${r.break_type}</td>
+            <td>${r.requests}</td>
+            <td>${r.impressions}</td>
+            <td>${pct(r.fill_rate)}</td>
+            <td>${num(r.ecpm, 2)}</td>
+            <td>${num(r.revenue, 3)}</td>
+          </tr>`).join("");
+
+        document.getElementById("pods").innerHTML = data.pods
+          .slice(0, 20)
+          .map((r) => `<tr>
+            <td class="mono">${r.event_date}</td>
+            <td class="mono">${String(r.pod_id).slice(0, 14)}</td>
+            <td>${r.break_type}</td>
+            <td>${r.platform}</td>
+            <td>${r.market}</td>
+            <td>${r.requests}</td>
+            <td>${r.impressions}</td>
+            <td>${r.filled ? "yes" : "no"}</td>
+            <td>${pct(r.pod_fill_rate)}</td>
+          </tr>`).join("");
+      });
+  </script>
+</body>
+</html>
