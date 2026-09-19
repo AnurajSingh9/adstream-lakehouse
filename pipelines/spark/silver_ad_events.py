@@ -14,7 +14,6 @@ import pandas as pd
 
 from pipelines.common.paths import bronze_dt, silver_dt
 
-
 REQUIRED = [
     "event_id",
     "event_type",

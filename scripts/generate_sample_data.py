@@ -11,7 +11,6 @@ import json
 import random
 import uuid
 from datetime import datetime, timedelta, timezone
-from pathlib import Path
 
 from pipelines.common.money import BREAK_TYPES, MARKETS, PLATFORMS
 from pipelines.common.paths import ROOT
